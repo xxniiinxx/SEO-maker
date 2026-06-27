@@ -1,0 +1,80 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging / install artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+pip-wheel-metadata/
+*.manifest
+*.spec
+
+# Test / coverage / type check caches
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# --- SEO-maker generated content ---
+output/*
+!output/.gitkeep
+
+# User project configs (keep example template tracked)
+config/projects/*
+!config/projects/example.yaml
+
+# --- Secrets & local env ---
+.env
+.env.*
+!.env.example
+*.pem
+credentials.json
+secrets.yaml
+secrets.yml
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# --- Editors / IDEs ---
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+*.sublime-project
+*.sublime-workspace
+
+# --- Logs & temp ---
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# --- Windows ---
+*.lnk

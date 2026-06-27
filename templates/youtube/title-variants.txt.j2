@@ -1,0 +1,9 @@
+Title variants for: {{ video.video_topic }}
+
+Pick one (target ≤70 characters):
+
+{% for variant in title_variants %}
+{{ loop.index }}. {{ variant }} ({{ variant | length }} chars)
+{% endfor %}
+
+Recommended: option 1 — keyword-first, under 70 chars.

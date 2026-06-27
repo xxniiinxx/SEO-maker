@@ -1,0 +1,48 @@
+# {{ github.primary_keyword }}
+
+*{{ github.short_description }}*
+
+## Introduction
+
+If you are searching for **{{ github.primary_keyword | lower }}** tooling in the {{ niche }} space, this project is worth a bookmark.
+
+## What {{ project_name }} does
+
+{% for feature in github.features %}
+- {{ feature }}
+{% else %}
+{{ github.short_description }}
+{% endfor %}
+
+## Who it is for
+
+{% for use_case in github.use_cases %}
+- {{ use_case }}
+{% else %}
+Developers exploring {{ github.primary_keyword | lower }} workflows.
+{% endfor %}
+
+## Get started
+
+Repository: {{ github.repo_url }}
+
+```bash
+git clone {{ github.repo_url }}.git
+cd {{ github.repo_name }}
+```
+
+{% if youtube.videos %}
+## Watch the tutorial
+
+{% for video in youtube.videos %}
+- {{ video.primary_keyword }} — {{ video.video_topic }}
+{% endfor %}
+{% endif %}
+
+## Final thoughts
+
+Star the repo if it helps your workflow. Issues and PRs welcome.
+
+**Keywords:** {{ github.primary_keyword }}{% for topic in github.topics %}, {{ topic }}{% endfor %}
+
+*Not financial advice. Use at your own risk.*

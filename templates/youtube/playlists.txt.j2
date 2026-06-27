@@ -1,0 +1,10 @@
+Suggested playlists for {{ youtube.channel_handle }}:
+
+{% for playlist in youtube.playlists %}
+- {{ playlist }}
+{% else %}
+- {{ project_name }} Tutorials
+- Project Walkthroughs
+{% endfor %}
+
+Add each video to the most relevant playlist for internal discovery and SEO.

@@ -1,0 +1,84 @@
+# {{ project_name }}
+
+> **{{ github.primary_keyword }}** — {{ github.short_description }}
+
+[![License: {{ github.license | default('MIT') }}](https://img.shields.io/badge/License-{{ github.license | default('MIT') }}-blue.svg)](LICENSE)
+
+## Table of Contents
+
+- [Features](#features)
+- [Use Cases](#use-cases)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Related Projects](#related-projects)
+{% if youtube.videos %} - [Videos](#videos){% endif %}
+- [FAQ](#faq)
+- [Disclaimer](#disclaimer)
+
+## Features
+
+{% for feature in github.features %}
+- {{ feature }}
+{% else %}
+- See repository documentation for feature overview
+{% endfor %}
+
+## Use Cases
+
+{% for use_case in github.use_cases %}
+- {{ use_case }}
+{% else %}
+- Learning and extending {{ github.primary_keyword | lower }} workflows
+{% endfor %}
+
+## Tech Stack
+
+{% for item in github.tech_stack %}
+- {{ item }}
+{% else %}
+- {{ github.language | default('See repo') }}
+{% endfor %}
+
+## Quick Start
+
+```bash
+git clone {{ github.repo_url }}.git
+cd {{ github.repo_name }}
+# install dependencies — see project docs
+```
+
+## Related Projects
+
+{% for repo in cross_links.related_repos %}
+- [{{ repo.name }}]({{ repo.url }})
+{% endfor %}
+{% if cross_links.website %}
+- [Project hub]({{ cross_links.website }})
+{% endif %}
+
+{% if youtube.videos %}
+## Videos
+
+Watch tutorials on {{ youtube.channel_handle }}:
+{% for video in youtube.videos %}
+- **{{ video.primary_keyword }}** — {{ video.video_topic }}
+{% endfor %}
+{% endif %}
+
+## FAQ
+
+### Is this financial advice?
+
+No. This project is for educational purposes only. Use at your own risk.
+
+### Can I fork and modify this?
+
+Yes. {{ github.license | default('MIT') }} licensed — fork, modify, and contribute via pull requests.
+
+## Disclaimer
+
+Not financial advice. Trading and software use involves risk. Past performance does not guarantee future results.
+
+---
+
+**Keywords:** {{ github.primary_keyword }}{% for topic in github.topics %}, {{ topic }}{% endfor %}

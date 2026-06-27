@@ -1,0 +1,59 @@
+
+## {{ github.primary_keyword }}
+
+{{ github.short_description }}
+
+{% if cross_links.youtube_videos %}
+### Demo & tutorials
+
+{% for yv in cross_links.youtube_videos %}
+- [{{ yv.title | default(yv.id) }}]({{ yv.url }}){% if yv.channel %} — {{ yv.channel }}{% endif %}
+{% endfor %}
+{% endif %}
+
+## Features
+
+{% for feature in github.features %}
+- {{ feature }}
+{% else %}
+- See repository documentation for feature overview
+{% endfor %}
+
+## Tech stack
+
+{% for item in github.tech_stack %}
+- {{ item }}
+{% else %}
+- {{ github.language | default('See repo') }}
+{% endfor %}
+
+## Use cases
+
+{% for use_case in github.use_cases %}
+- {{ use_case }}
+{% else %}
+- Extend and customize {{ github.primary_keyword | lower }}
+{% endfor %}
+
+{% if cross_links.related_repos %}
+## Related projects
+
+{% for repo in cross_links.related_repos %}
+- [{{ repo.name }}]({{ repo.url }})
+{% endfor %}
+{% endif %}
+
+## FAQ
+
+**Is this financial advice?**
+
+No. This project is for educational and research purposes only.
+
+## Disclaimer
+
+- Use at your own risk. No guarantees of profit or uptime.
+- Review licenses and platform terms before deploying.
+
+## License
+
+{{ github.license | default('MIT') }}

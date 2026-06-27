@@ -1,0 +1,33 @@
+SEO promotion checklist for {{ project_name }}
+================================================
+
+GitHub (Phase 1 — GUIDE-1)
+[ ] Paste about.txt into repo Description
+[ ] Add topics from topics.txt
+[ ] Merge readme-seo-sections.md into README (or replace with readme-seo.md)
+[ ] Cross-link related repos and YouTube in README
+[ ] Add license, .gitignore, releases if missing
+
+YouTube (Phase 1–2)
+[ ] Update channel About from youtube/channel-about.txt
+[ ] Create playlists from youtube/playlists.txt
+{% for video in youtube.videos %}
+[ ] Upload video: {{ video.id }}
+    [ ] Title from youtube/{{ video.id }}/title-variants.txt
+    [ ] Description from youtube/{{ video.id }}/description.txt
+    [ ] Tags from youtube/{{ video.id }}/tags.txt
+    [ ] End screens from youtube/{{ video.id }}/end-screen-cards.txt
+{% endfor %}
+
+Social & backlinks (Phase 3)
+[ ] Publish dev.to post → social/devto-post.md
+[ ] Publish Medium post → social/medium-post.md
+[ ] Post X thread → social/x-post-thread.txt
+[ ] Share on Reddit → social/reddit-post.txt (check sub rules)
+[ ] LinkedIn → social/linkedin-post.txt
+[ ] Discord communities → social/discord-announcement.txt
+
+Monitoring (Phase 4)
+[ ] Google Search Console / YouTube Analytics — track search terms
+[ ] GitHub traffic insights — referral sources
+[ ] Iterate every 2–4 weeks on top-performing keywords

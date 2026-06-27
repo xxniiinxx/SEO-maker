@@ -1,0 +1,32 @@
+Title ideas (pick one):
+
+- [Project] {{ github.primary_keyword }} — open source {{ github.repo_name }}
+- I built {{ github.primary_keyword | lower }} ({{ github.language | default('OSS') }}) — feedback welcome
+- Showoff: {{ project_name }} for {{ niche }}
+
+---
+Post body (Markdown):
+
+Hey {{ niche }} community,
+
+I published **{{ project_name }}** — {{ github.short_description }}
+
+**Features:**
+{% for feature in github.features %}
+- {{ feature }}
+{% else %}
+- See README on GitHub
+{% endfor %}
+
+**Repo:** {{ github.repo_url }}
+
+{% if youtube.videos %}**Video:** {{ youtube.videos[0].primary_keyword }} — {{ youtube.videos[0].video_topic }}
+{% endif %}
+Would love feedback, stars, and issue reports. Not financial advice.
+
+---
+Suggested subreddits (verify each sub's self-promo rules first):
+
+{% for sub in social.subreddits | default(['r/opensource', 'r/programming']) %}
+- {{ sub }}
+{% endfor %}

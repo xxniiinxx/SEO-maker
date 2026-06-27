@@ -1,0 +1,67 @@
+---
+title: "{{ github.primary_keyword }}: {{ github.short_description | truncate(60, True, '...') }}"
+published: false
+tags: {% for topic in github.topics %}{{ topic }}{% if not loop.last %}, {% endif %}{% endfor %}
+canonical_url: {{ github.repo_url }}
+---
+
+# {{ github.primary_keyword }}
+
+{{ github.short_description }}
+
+I open-sourced **{{ project_name }}** to help developers working in {{ niche | lower }}.
+
+## Why I built this
+
+{% for use_case in github.use_cases %}
+- {{ use_case }}
+{% else %}
+- Practical automation for {{ github.primary_keyword | lower }}
+{% endfor %}
+
+## Features
+
+{% for feature in github.features %}
+- {{ feature }}
+{% else %}
+- See the repo README for the full feature list
+{% endfor %}
+
+## Quick start
+
+Clone the repo and follow the setup guide:
+
+```bash
+git clone {{ github.repo_url }}.git
+cd {{ github.repo_name }}
+```
+
+Full docs: {{ github.repo_url }}
+
+{% if youtube.videos %}
+## Video walkthrough
+
+{% for video in youtube.videos %}
+- **{{ video.primary_keyword }}** — {{ video.video_topic }}
+{% endfor %}
+{% endif %}
+
+## Tech stack
+
+{% for item in github.tech_stack %}
+- {{ item }}
+{% else %}
+- {{ github.language | default('See repository') }}
+{% endfor %}
+
+## Links
+
+- GitHub: {{ github.repo_url }}
+{% if cross_links.website %}- Website: {{ cross_links.website }}
+{% endif %}
+
+---
+
+*Disclaimer: Educational content only. Not financial advice.*
+
+{% for tag in social.hashtags | default([]) %}#{{ tag | replace('#', '') | replace(' ', '') }} {% endfor %}

@@ -1,0 +1,108 @@
+# Example project config — copy via: python -m src.generate init my-project
+
+project_name: pm-copy-trader
+niche: Polymarket and Solana crypto trading bots
+
+github:
+  repo_url: https://github.com/example/pm-copy-trader
+  repo_name: pm-copy-trader
+  primary_keyword: Polymarket copy trading bot
+  short_description: >-
+    Polymarket copy trading bot — Open-source Polymarket late-window snipe bot
+    for BTC/ETH/SOL/XRP 5m markets. Automate copy-trading strategies with TypeScript.
+  topics:
+    - polymarket
+    - crypto-trading-bot
+    - solana-bot
+    - copy-trading
+    - typescript-bot
+    - prediction-market
+    - solana-copytrade
+  license: MIT
+  language: TypeScript
+  features:
+    - Late-window snipe detection for 5-minute markets
+    - Multi-asset support (BTC, ETH, SOL, XRP)
+    - Configurable risk and position sizing
+    - Live demo mode and paper trading
+  tech_stack:
+    - TypeScript
+    - Node.js
+    - Polymarket API
+  use_cases:
+    - Automate late-window snipe entries on Polymarket
+    - Backtest copy-trading strategies before going live
+    - Learn prediction-market bot architecture
+  repo_name_suggestions:
+    - polymarket-copy-trading-bot
+    - pm-copy-trader
+    - polymarket-snipe-bot
+
+youtube:
+  channel_handle: "@PMTraderAdams"
+  channel_about_keywords:
+    - Solana trading bots
+    - Polymarket strategies
+    - crypto dev tools
+  playlists:
+    - Polymarket Bots
+    - Solana Copy Trading
+    - Crypto Dev Tools
+  videos:
+    - id: setup-tutorial
+      primary_keyword: Polymarket trading bot tutorial
+      video_topic: How to set up and run the late-window snipe bot step by step
+      year: "2026"
+      target_length_minutes: 12
+      secondary_keywords:
+        - solana-bot
+        - crypto-trading-bot
+        - prediction-market
+      timestamps:
+        - "0:00 Intro and disclaimer"
+        - "1:30 Prerequisites and API keys"
+        - "4:00 Clone repo and install"
+        - "6:30 Configuration walkthrough"
+        - "9:00 Live demo"
+        - "11:00 GitHub link and next steps"
+    - id: strategy-breakdown
+      primary_keyword: Polymarket snipe strategy
+      video_topic: Late-window snipe strategy explained with live results
+      year: "2026"
+      target_length_minutes: 10
+      secondary_keywords:
+        - polymarket bot
+        - copy trading
+      timestamps:
+        - "0:00 Intro"
+        - "2:00 Strategy overview"
+        - "5:00 Live results"
+        - "8:00 Risk and disclaimer"
+
+cross_links:
+  website: https://pmtrader.dev
+  related_repos:
+    - name: solana-copytrading-bot
+      url: https://github.com/example/solana-copytrading-bot
+  youtube_videos:
+    - id: setup-tutorial
+      title: How to set up and run the late-window snipe bot
+      url: https://youtube.com/watch?v=example-setup-tutorial
+      channel: "@PMTraderAdams"
+    - id: strategy-breakdown
+      title: Late-window snipe strategy explained with live results
+      url: https://youtube.com/watch?v=example-strategy-breakdown
+      channel: "@PMTraderAdams"
+
+social:
+  enabled: true
+  hashtags:
+    - polymarket
+    - cryptotradingbot
+    - solanabot
+    - opensource
+  subreddits:
+    - r/algotrading
+    - r/solana
+    - r/Polymarket
+    - r/opensource

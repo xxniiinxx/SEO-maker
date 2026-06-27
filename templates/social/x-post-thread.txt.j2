@@ -1,0 +1,32 @@
+Thread: Launch / promote {{ project_name }}
+
+---
+Tweet 1 (hook):
+Open-sourced {{ github.primary_keyword }} 🚀
+
+{{ github.short_description | truncate(200, True, '...') }}
+
+⭐ {{ github.repo_url }}
+
+---
+Tweet 2 (features):
+What you get:
+{% for feature in github.features[:4] %}
+• {{ feature }}
+{% else %}
+• Full source on GitHub
+• Docs + setup guide
+{% endfor %}
+
+---
+Tweet 3 (CTA):
+{% if youtube.videos %}🎥 Tutorial: {{ youtube.videos[0].primary_keyword }}
+{% endif %}🔗 Repo: {{ github.repo_url }}
+{% if cross_links.website %}🌐 {{ cross_links.website }}
+{% endif %}
+
+{% for tag in social.hashtags | default([]) %}#{{ tag | replace('#', '') | replace(' ', '') }} {% endfor %}
+
+---
+Single-post variant (≤280 chars target):
+New: {{ github.primary_keyword }} — {{ github.short_description | truncate(120, True, '...') }} {{ github.repo_url }}

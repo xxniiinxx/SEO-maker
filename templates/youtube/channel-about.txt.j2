@@ -1,0 +1,19 @@
+Channel: {{ youtube.channel_handle }}
+Niche: {{ niche }}
+
+Suggested About section (paste into YouTube channel About):
+
+---
+{{ youtube.channel_handle }} — {{ niche }}.
+
+Building and documenting open-source projects and dev tools.
+{% for kw in youtube.channel_about_keywords | default([]) %}
+• {{ kw }}
+{% endfor %}
+
+🔗 GitHub: {{ github.repo_url }}
+{% if cross_links.website %}🌐 Site: {{ cross_links.website }}
+{% endif %}
+Subscribe for tutorials, live demos, and strategy breakdowns.
+Not financial advice. Use at your own risk.
+---

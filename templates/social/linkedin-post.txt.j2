@@ -1,0 +1,22 @@
+LinkedIn post — {{ project_name }}
+
+---
+I just open-sourced {{ github.primary_keyword }}.
+
+{{ github.short_description }}
+
+What it helps with:
+{% for use_case in github.use_cases %}
+• {{ use_case }}
+{% else %}
+• Practical workflows for {{ niche | lower }}
+{% endfor %}
+
+Tech: {% for item in github.tech_stack %}{{ item }}{% if not loop.last %}, {% endif %}{% else %}{{ github.language | default('open source') }}{% endfor %}
+
+Explore the repo: {{ github.repo_url }}
+{% if cross_links.website %}
+Project page: {{ cross_links.website }}
+{% endif %}
+
+#OpenSource #Developer #{{ github.primary_keyword | replace(' ', '') | replace('-', '') }}

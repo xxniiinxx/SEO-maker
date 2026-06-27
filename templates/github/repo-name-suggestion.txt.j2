@@ -1,0 +1,9 @@
+Current repo name: {{ github.repo_name }}
+
+Suggested keyword-rich alternatives (if renaming is feasible):
+
+{% for suggestion in github.repo_name_suggestions | default([github.repo_name]) %}
+- {{ suggestion }}
+{% endfor %}
+
+Keep names descriptive: include primary keywords like "{{ github.primary_keyword | lower }}" where natural.

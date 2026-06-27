@@ -1,0 +1,16 @@
+End screens and cards for: {{ video.primary_keyword }}
+
+End screen (last 20 seconds):
+- Subscribe button
+- Best-for-viewer video OR related tutorial
+- Link element → {{ github.repo_url }}
+
+Cards (place during video):
+- At setup/demo moment → link to GitHub repo
+{% if cross_links.website %}- At outro → link to {{ cross_links.website }}
+{% endif %}
+{% for repo in cross_links.related_repos %}
+- Mention {{ repo.name }} → {{ repo.url }}
+{% endfor %}
+
+Cross-promote: embed this video in the GitHub README under "Videos".

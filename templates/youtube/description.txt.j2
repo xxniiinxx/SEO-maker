@@ -1,0 +1,25 @@
+{{ description_lead }}
+
+🔗 GitHub repo: {{ github.repo_url }}
+📺 Channel: {{ youtube.channel_handle }}
+{% if cross_links.website %}🌐 Project hub: {{ cross_links.website }}
+{% endif %}
+⏱ Timestamps:
+{% for ts in video.timestamps %}
+{{ ts }}
+{% else %}
+0:00 Intro
+1:00 Overview
+{% endfor %}
+
+{% for repo in cross_links.related_repos %}
+Related project: {{ repo.name }} — {{ repo.url }}
+{% endfor %}
+
+---
+Tags: {{ tags | join(', ') }}
+{% if video.target_length_minutes %}Target length: ~{{ video.target_length_minutes }} minutes
+{% endif %}
+Not financial advice. Use at your own risk. Past performance does not guarantee future results.
+
+{% for tag in social.hashtags | default([]) %}#{{ tag | replace('#', '') | replace(' ', '') }} {% endfor %}
