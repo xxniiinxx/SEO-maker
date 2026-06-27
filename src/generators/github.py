@@ -1,23 +1,25 @@
 from pathlib import Path
 
+from src.content_enrich import enrich_social_context
 from src.render import render
 from src.rules import validate_github
 
 
 def generate_github_pack(config: dict, output_dir: Path) -> list[str]:
-    github = config.get("github") or {}
+    enriched = enrich_social_context(config)
+    github = enriched.get("github") or {}
     warnings = validate_github(github)
     out = output_dir / "github"
     out.mkdir(parents=True, exist_ok=True)
 
     ctx = {
-        "config": config,
+        "config": enriched,
         "github": github,
-        "cross_links": config.get("cross_links") or {},
-        "youtube": config.get("youtube") or {},
-        "social": config.get("social") or {},
-        "project_name": config.get("project_name", ""),
-        "niche": config.get("niche", ""),
+        "cross_links": enriched.get("cross_links") or {},
+        "youtube": enriched.get("youtube") or {},
+        "social": enriched.get("social") or {},
+        "project_name": enriched.get("project_name", ""),
+        "niche": enriched.get("niche", ""),
     }
 
     files = {

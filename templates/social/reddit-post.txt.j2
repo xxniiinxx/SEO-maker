@@ -1,32 +1,45 @@
+Reddit post — {{ project_name }}
+==================================
+
 Title ideas (pick one):
 
-- [Project] {{ github.primary_keyword }} — open source {{ github.repo_name }}
-- I built {{ github.primary_keyword | lower }} ({{ github.language | default('OSS') }}) — feedback welcome
-- Showoff: {{ project_name }} for {{ niche }}
+- [Showcase] {{ github.primary_keyword }} — open-source {{ github.repo_name }} ({{ github.language | default('OSS') }})
+- I built {{ github.primary_keyword | lower }} — full stack with on-chain + backend, feedback welcome
+- Open-sourced {{ project_name }} for {{ niche | lower }} — repo inside
 
 ---
-Post body (Markdown):
+Post body (Markdown — adjust tone per subreddit):
 
-Hey {{ niche }} community,
+Hey folks,
 
-I published **{{ project_name }}** — {{ github.short_description }}
+I open-sourced **{{ project_name }}** — {{ github.short_description }}
 
-**Features:**
-{% for feature in github.features %}
-- {{ feature }}
-{% else %}
-- See README on GitHub
+**Why it's useful**
+{% for use_case in github.use_cases %}
+- {{ use_case }}
 {% endfor %}
 
-**Repo:** {{ github.repo_url }}
+**Highlights**
+{% for feature in github.features %}
+- {{ feature }}
+{% endfor %}
+
+**Stack:** {% for item in github.tech_stack %}{{ item }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+**Links**
+- Repo: {{ github.repo_url }}
+{% if cross_links.website %}- Live site: {{ cross_links.website }}
+{% endif %}
 
 {% if youtube.videos %}**Video:** {{ youtube.videos[0].primary_keyword }} — {{ youtube.videos[0].video_topic }}
 {% endif %}
-Would love feedback, stars, and issue reports. Not financial advice.
+Happy to answer questions about architecture, VRF, or deployment. Stars and constructive feedback appreciated.
+
+*Not financial advice. Educational / dev discussion only.*
 
 ---
-Suggested subreddits (verify each sub's self-promo rules first):
+Suggested subreddits (read each sub's self-promo rules first):
 
-{% for sub in social.subreddits | default(['r/opensource', 'r/programming']) %}
+{% for sub in social.subreddits %}
 - {{ sub }}
 {% endfor %}

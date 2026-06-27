@@ -22,17 +22,34 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### Option A — Interactive wizard (recommended)
+### Option A — Fully automatic (provide one or both URLs)
 
-Provide your GitHub repo URL; the wizard fetches metadata and prompts for SEO fields:
+Give **either** a GitHub repo **or** a YouTube video URL (or both). SEO-maker detects the URL type and generates only the relevant packs:
 
 ```powershell
-python -m src.generate wizard https://github.com/owner/your-repo -g
+# GitHub repo only → github/ + social/
+python -m src.generate auto https://github.com/owner/your-repo -g -f
+
+# YouTube video only → youtube/ + social/
+python -m src.generate auto "https://www.youtube.com/watch?v=VIDEO_ID" -g -f
+
+# Both (optional)
+python -m src.generate auto https://github.com/owner/repo `
+  --youtube "https://www.youtube.com/watch?v=VIDEO_ID" -g -f
 ```
 
-`-g` generates the full SEO pack immediately after saving config.
+`-g` generates output; `-f` overwrites an existing config.
 
-### Option B — Edit YAML config manually
+### Option B — Interactive wizard
+
+Prompts for extra fields after fetching GitHub (and optional `--youtube` / `--channel` URLs):
+
+```powershell
+python -m src.generate wizard https://github.com/owner/your-repo `
+  --youtube "https://www.youtube.com/watch?v=VIDEO_ID" -g
+```
+
+### Option C — Edit YAML manually
 
 ```powershell
 python -m src.generate init my-project
@@ -40,21 +57,22 @@ python -m src.generate init my-project
 python -m src.generate generate config/projects/my-project.yaml
 ```
 
-### Option C — Auto-seed from GitHub URL
+### Refresh config from saved sources
+
+If your YAML has a `sources:` block (auto-added), re-fetch GitHub/YouTube and regenerate:
 
 ```powershell
-python -m src.generate from-repo https://github.com/owner/your-repo -g
+python -m src.generate generate config/projects/your-project.yaml --refresh
 ```
-
-Fetches repo description, topics, and language; merges with `example.yaml` structure. Edit the YAML before publishing.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `wizard <repo-url> [-g]` | Interactive config + optional generate |
-| `from-repo <repo-url> [-g]` | Seed config from GitHub API |
-| `generate <config.yaml>` | Generate full SEO pack |
+| `auto [url] [--repo] [--youtube] [-g]` | Auto-build YAML; GitHub only, YouTube only, or both |
+| `wizard [url] [--repo] [--youtube] [-g]` | Interactive config + optional generate |
+| `from-repo [url]` | Alias for `auto` |
+| `generate <config.yaml> [--refresh]` | Generate SEO pack (optionally refresh YAML first) |
 | `validate <config.yaml>` | Check config against GUIDE rules |
 | `init <name>` | Copy example config for a new project |
 | `list` | List configs in `config/projects/` |
@@ -63,6 +81,7 @@ Fetches repo description, topics, and language; merges with `example.yaml` struc
 
 Each project is a YAML file in `config/projects/`. Key sections:
 
+- **`sources`** — input URLs and `mode`: `github`, `youtube`, or `both` (controls which output folders are generated)
 - **`github`** — repo URL, primary keyword, about text, topics, features, tech stack
 - **`youtube`** — channel handle, playlists, video definitions (keywords, timestamps)
 - **`cross_links`** — website, related repos, YouTube URLs for README embeds

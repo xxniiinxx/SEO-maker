@@ -3,15 +3,21 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 from pathlib import Path
 
 import yaml
 
+from src.config_builder import (
+    auto_build_config,
+    get_content_modes,
+    parse_input_urls,
+    refresh_config_from_sources,
+)
 from src.generators.github import generate_github_pack
 from src.generators.social import generate_social_pack
 from src.generators.youtube import generate_youtube_pack
-from src.github_fetch import fetch_repo, repo_to_config_seed
 from src.rules import validate_github, validate_youtube_video
 from src.wizard import run_wizard, save_config
 
@@ -31,16 +37,20 @@ def load_config(path: Path) -> dict:
 
 def validate_config(config: dict) -> list[str]:
     warnings: list[str] = []
-    github = config.get("github")
-    if not github:
-        warnings.append("WARNING: Missing 'github' section.")
-    else:
-        warnings.extend(validate_github(github))
+    modes = get_content_modes(config)
 
-    youtube = config.get("youtube") or {}
-    for video in youtube.get("videos") or []:
-        video_id = video.get("id", "unknown")
-        warnings.extend(validate_youtube_video(video, video_id, config))
+    if modes["github"]:
+        github = config.get("github")
+        if not github:
+            warnings.append("WARNING: Missing 'github' section.")
+        else:
+            warnings.extend(validate_github(github))
+
+    if modes["youtube"]:
+        youtube = config.get("youtube") or {}
+        for video in youtube.get("videos") or []:
+            video_id = video.get("id", "unknown")
+            warnings.extend(validate_youtube_video(video, video_id, config))
 
     return warnings
 
@@ -67,9 +77,20 @@ def write_validation_report(output_dir: Path, warnings: list[str]) -> None:
 
 def generate_all(config: dict, output_dir: Path) -> list[str]:
     warnings: list[str] = []
-    warnings.extend(generate_github_pack(config, output_dir))
-    warnings.extend(generate_youtube_pack(config, output_dir))
-    warnings.extend(generate_social_pack(config, output_dir))
+    modes = get_content_modes(config)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for pack in ("github", "youtube"):
+        if not modes.get(pack) and (output_dir / pack).exists():
+            shutil.rmtree(output_dir / pack)
+
+    if modes["github"]:
+        warnings.extend(generate_github_pack(config, output_dir))
+    if modes["youtube"]:
+        warnings.extend(generate_youtube_pack(config, output_dir))
+    if modes["social"]:
+        warnings.extend(generate_social_pack(config, output_dir))
+
     write_validation_report(output_dir, warnings)
     return warnings
 
@@ -89,6 +110,13 @@ def cmd_validate(args: argparse.Namespace) -> int:
 def cmd_generate(args: argparse.Namespace) -> int:
     config_path = Path(args.config)
     config = load_config(config_path)
+
+    if args.refresh:
+        print("Refreshing config from GitHub/YouTube sources ...")
+        config = refresh_config_from_sources(config, github_token=args.token)
+        save_config(config, config_path)
+        print(f"Updated config: {config_path}")
+
     project_name = config.get("project_name") or config_path.stem
     output_dir = Path(args.output) / project_name
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -144,12 +172,39 @@ def cmd_init(args: argparse.Namespace) -> int:
 
 
 def cmd_wizard(args: argparse.Namespace) -> int:
-    repo_url = args.repo_url.strip()
-    if not repo_url:
-        print("GitHub repo URL required.")
+    try:
+        repo_url, video_urls, channel_url = parse_input_urls(
+            url=args.url,
+            repo=args.repo,
+            youtube=args.youtube,
+            channel=args.channel,
+        )
+    except ValueError as exc:
+        print(exc)
         return 1
 
-    config = run_wizard(repo_url, token=args.token)
+    if not repo_url and not video_urls and not channel_url:
+        print("Provide a GitHub repo URL or YouTube video/channel URL.")
+        return 1
+
+    if repo_url and not video_urls and not channel_url:
+        config = run_wizard(repo_url, token=args.token)
+    elif not repo_url:
+        from src.config_builder import build_config_from_youtube, finalize_config
+
+        config = build_config_from_youtube(video_urls, channel_url, args.niche or "")
+        print("\nAuto-filled from YouTube.")
+        niche = input(f"Niche [{config['niche']}]: ").strip()
+        if niche:
+            config["niche"] = niche
+        config = finalize_config(config)
+    else:
+        config = run_wizard(
+            repo_url,
+            token=args.token,
+            youtube_urls=video_urls,
+            channel_url=channel_url,
+        )
     name = config.get("project_name") or "project"
     dest = Path(args.output) if args.output else DEFAULT_PROJECTS_DIR / f"{name}.yaml"
 
@@ -177,34 +232,75 @@ def cmd_wizard(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_from_repo(args: argparse.Namespace) -> int:
-    repo_url = args.repo_url.strip()
-    print(f"Fetching {repo_url} ...")
-    repo = fetch_repo(repo_url, token=args.token)
-    config = repo_to_config_seed(repo, niche=args.niche or "")
+def cmd_auto(args: argparse.Namespace) -> int:
+    try:
+        repo_url, video_urls, channel_url = parse_input_urls(
+            url=args.url,
+            repo=args.repo,
+            youtube=args.youtube,
+            channel=args.channel,
+        )
+    except ValueError as exc:
+        print(exc)
+        return 1
 
-    if EXAMPLE_CONFIG.is_file():
-        example = load_config(EXAMPLE_CONFIG)
-        for key in ("youtube", "cross_links", "social"):
-            if key in example and not config.get(key):
-                config[key] = example[key]
+    if not repo_url and not video_urls and not channel_url:
+        print("Provide a GitHub repo URL or YouTube video/channel URL.")
+        print("Examples:")
+        print("  python -m src.generate auto https://github.com/owner/repo -g")
+        print("  python -m src.generate auto https://www.youtube.com/watch?v=VIDEO_ID -g")
+        return 1
+
+    if repo_url:
+        print(f"GitHub repo: {repo_url}")
+    if video_urls:
+        print(f"YouTube videos: {len(video_urls)}")
+    if channel_url:
+        print(f"YouTube channel: {channel_url}")
+
+    config = auto_build_config(
+        repo_url=repo_url,
+        youtube_video_urls=video_urls,
+        youtube_channel_url=channel_url,
+        niche=args.niche or "",
+        github_token=args.token,
+    )
+
+    modes = get_content_modes(config)
+    print(
+        "Content packs: "
+        + ", ".join(name for name, enabled in modes.items() if enabled)
+    )
 
     name = config["project_name"]
-    dest = DEFAULT_PROJECTS_DIR / f"{name}.yaml"
+    dest = Path(args.output) if args.output else DEFAULT_PROJECTS_DIR / f"{name}.yaml"
+    if dest.is_dir():
+        dest = dest / f"{name}.yaml"
+
     if dest.exists() and not args.force:
-        print(f"Config exists: {dest} — use --force or run wizard for interactive fill-in")
-        config = load_config(dest)
-    else:
-        save_config(config, dest)
-        print(f"Seeded config: {dest}")
-        print("Edit the YAML to complete SEO fields, or run: python -m src.generate wizard", repo_url)
+        print(f"Already exists: {dest} (use --force to overwrite)")
+        return 1
+
+    save_config(config, dest)
+    print(f"Saved config: {dest}")
 
     if args.generate:
         output_dir = DEFAULT_OUTPUT_DIR / name
-        generate_all(config, output_dir)
-        print(f"Generated: {output_dir}")
+        warnings = generate_all(config, output_dir)
+        print(f"Generated SEO pack: {output_dir}")
+        if warnings:
+            print("\nWarnings:")
+            for line in warnings:
+                print(f"  {line}")
+    else:
+        print(f"Run: python -m src.generate generate {dest}")
 
     return 0
+
+
+def cmd_from_repo(args: argparse.Namespace) -> int:
+    """Legacy alias for auto-build from GitHub (+ optional YouTube URLs)."""
+    return cmd_auto(args)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -217,6 +313,12 @@ def build_parser() -> argparse.ArgumentParser:
     gen = sub.add_parser("generate", help="Generate SEO pack for a project config")
     gen.add_argument("config", help="Path to project YAML (e.g. config/projects/example.yaml)")
     gen.add_argument("-o", "--output", default=str(DEFAULT_OUTPUT_DIR), help="Output root directory")
+    gen.add_argument(
+        "--refresh",
+        action="store_true",
+        help="Re-fetch GitHub/YouTube metadata into config before generating",
+    )
+    gen.add_argument("--token", help="GitHub API token (optional, for refresh rate limits)")
     gen.set_defaults(func=cmd_generate)
 
     val = sub.add_parser("validate", help="Validate config against SEO rules")
@@ -230,18 +332,40 @@ def build_parser() -> argparse.ArgumentParser:
     init.add_argument("-f", "--force", action="store_true", help="Overwrite if exists")
     init.set_defaults(func=cmd_init)
 
-    wiz = sub.add_parser("wizard", help="Interactive config from GitHub repo URL")
-    wiz.add_argument("repo_url", help="GitHub repository URL")
-    wiz.add_argument("-o", "--output", help="Save config path (default: config/projects/<repo>.yaml)")
+    wiz = sub.add_parser("wizard", help="Interactive config from GitHub and/or YouTube URL")
+    wiz.add_argument("url", nargs="?", help="GitHub repo or YouTube video/channel URL")
+    wiz.add_argument("--repo", help="GitHub repository URL")
+    wiz.add_argument("-o", "--output", help="Save config path (default: config/projects/<name>.yaml)")
     wiz.add_argument("-g", "--generate", action="store_true", help="Generate SEO pack after wizard")
     wiz.add_argument("-f", "--force", action="store_true", help="Overwrite existing config")
     wiz.add_argument("--token", help="GitHub API token (optional, for rate limits)")
+    wiz.add_argument("--youtube", action="append", help="YouTube video URL (repeatable)")
+    wiz.add_argument("--channel", help="YouTube channel URL (e.g. https://youtube.com/@handle)")
+    wiz.add_argument("--niche", help="Override niche string")
     wiz.set_defaults(func=cmd_wizard)
 
-    fr = sub.add_parser("from-repo", help="Seed config from GitHub repo metadata")
-    fr.add_argument("repo_url", help="GitHub repository URL")
+    auto = sub.add_parser(
+        "auto",
+        help="Auto-build YAML from GitHub repo and/or YouTube URL (provide at least one)",
+    )
+    auto.add_argument("url", nargs="?", help="GitHub repo or YouTube video/channel URL")
+    auto.add_argument("--repo", help="GitHub repository URL")
+    auto.add_argument("--youtube", action="append", help="YouTube video URL (repeatable)")
+    auto.add_argument("--channel", help="YouTube channel URL")
+    auto.add_argument("--niche", help="Override niche string")
+    auto.add_argument("-o", "--output", help="Save config path (default: config/projects/<name>.yaml)")
+    auto.add_argument("-g", "--generate", action="store_true", help="Generate SEO pack after saving config")
+    auto.add_argument("-f", "--force", action="store_true", help="Overwrite existing config")
+    auto.add_argument("--token", help="GitHub API token (optional)")
+    auto.set_defaults(func=cmd_auto)
+
+    fr = sub.add_parser("from-repo", help="Alias for auto with --repo")
+    fr.add_argument("url", nargs="?", help="GitHub repo URL (or use --repo)")
+    fr.add_argument("--repo", help="GitHub repository URL")
+    fr.add_argument("--youtube", action="append", help="YouTube video URL (repeatable)")
+    fr.add_argument("--channel", help="YouTube channel URL")
     fr.add_argument("--niche", help="Override niche string")
-    fr.add_argument("-g", "--generate", action="store_true", help="Generate after seeding")
+    fr.add_argument("-g", "--generate", action="store_true", help="Generate after saving")
     fr.add_argument("-f", "--force", action="store_true", help="Overwrite existing config")
     fr.add_argument("--token", help="GitHub API token (optional)")
     fr.set_defaults(func=cmd_from_repo)

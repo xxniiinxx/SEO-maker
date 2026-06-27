@@ -165,3 +165,29 @@ def build_youtube_tags(video: dict, config: dict) -> list[str]:
         if len(result) >= YOUTUBE_TAGS_MAX:
             break
     return result
+
+
+DEVTO_MAX_TAGS = 4
+DEVTO_MIN_WORDS_HINT = 400
+
+
+def validate_social(config: dict) -> list[str]:
+    warnings: list[str] = []
+    github = config.get("github") or {}
+    primary = github.get("primary_keyword") or ""
+
+    if len(primary) < 10:
+        warnings.append(_warn("social: primary_keyword looks too short for post titles."))
+
+    devto_tags = config.get("devto_tags") or []
+    if len(devto_tags) > DEVTO_MAX_TAGS:
+        warnings.append(_warn(f"social/devto: use at most {DEVTO_MAX_TAGS} tags on dev.to."))
+
+    features = github.get("features") or []
+    if len(features) < 3:
+        warnings.append(_warn("social: fewer than 3 features — posts may feel thin."))
+
+    if not config.get("architecture_points"):
+        warnings.append(_warn("social: no architecture points generated — review dev.to post."))
+
+    return warnings

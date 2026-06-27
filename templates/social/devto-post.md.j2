@@ -1,67 +1,129 @@
 ---
-title: "{{ github.primary_keyword }}: {{ github.short_description | truncate(60, True, '...') }}"
+title: "{{ devto_title }}"
 published: false
-tags: {% for topic in github.topics %}{{ topic }}{% if not loop.last %}, {% endif %}{% endfor %}
-canonical_url: {{ github.repo_url }}
+tags:
+{% for tag in devto_tags %}
+  - {{ tag }}
+{% endfor %}
+canonical_url: {{ primary_video_url if is_video_only else github.repo_url }}
+cover_image: {{ cross_links.website if cross_links.website else (primary_video_url if is_video_only else github.repo_url) }}
 ---
+
+> **{{ cover_image_hint }}**
 
 # {{ github.primary_keyword }}
 
 {{ github.short_description }}
 
-I open-sourced **{{ project_name }}** to help developers working in {{ niche | lower }}.
+{% if is_video_only %}
+I published a new tutorial on **{{ youtube.channel_handle or 'YouTube' }}** for developers in **{{ niche }}**. This post summarizes the video and links to the full walkthrough.
+
+**Watch:** [{{ github.primary_keyword }}]({{ primary_video_url }})
+{% else %}
+I open-sourced [**{{ project_name }}**]({{ github.repo_url }}) for developers in **{{ niche }}**. This post walks through what it does, how the pieces fit together, and how to run it locally.
+{% endif %}
+
+{% if cross_links.website %}
+**Live demo / site:** [{{ cross_links.website }}]({{ cross_links.website }})
+{% endif %}
 
 ## Why I built this
 
 {% for use_case in github.use_cases %}
 - {{ use_case }}
-{% else %}
-- Practical automation for {{ github.primary_keyword | lower }}
 {% endfor %}
 
-## Features
+{% if not is_video_only %}
+Most tutorials stop at a smart contract or a UI mockup. I wanted a **complete vertical slice** — wallet flow, on-chain logic, backend state, and a responsive frontend — so you can study or fork a production-shaped codebase.
+{% endif %}
+
+## What it does
 
 {% for feature in github.features %}
 - {{ feature }}
-{% else %}
-- See the repo README for the full feature list
 {% endfor %}
 
-## Quick start
+{% if not is_video_only %}
+## Architecture at a glance
 
-Clone the repo and follow the setup guide:
+{% for point in architecture_points %}
+- {{ point }}
+{% endfor %}
 
-```bash
-git clone {{ github.repo_url }}.git
-cd {{ github.repo_name }}
+```text
+User Wallet  →  On-chain Program  →  VRF / Settlement
+                    ↓
+              Backend (API + WebSockets)  →  MongoDB / state
+                    ↓
+                 Frontend UI (real-time)
 ```
 
-Full docs: {{ github.repo_url }}
-
-{% if youtube.videos %}
-## Video walkthrough
-
-{% for video in youtube.videos %}
-- **{{ video.primary_keyword }}** — {{ video.video_topic }}
-{% endfor %}
-{% endif %}
+Adjust the diagram to match your repo layout if components differ.
 
 ## Tech stack
 
 {% for item in github.tech_stack %}
 - {{ item }}
-{% else %}
-- {{ github.language | default('See repository') }}
 {% endfor %}
+{% endif %}
+
+## {% if is_video_only %}How to follow along{% else %}Quick start{% endif %}
+
+{% if github.repo_url and not is_video_only %}
+```bash
+git clone {{ github.repo_url }}.git
+cd {{ github.repo_name }}
+```
+{% endif %}
+
+**{% if is_video_only %}Steps{% else %}Setup steps{% endif %}:**
+
+{% for step in setup_steps %}
+{{ loop.index }}. {{ step }}
+{% endfor %}
+
+{% if github.repo_url and not is_video_only %}
+See the full README for environment variables, deploy scripts, and test commands: [{{ github.repo_url }}]({{ github.repo_url }})
+{% endif %}
+
+{% if youtube.videos %}
+## Video walkthrough
+
+{% for video in youtube.videos %}
+- [**{{ video.primary_keyword }}**]({{ cross_links.youtube_videos[loop.index0].url if cross_links.youtube_videos and cross_links.youtube_videos|length > loop.index0 else github.repo_url }}) — {{ video.video_topic }}
+{% endfor %}
+{% endif %}
+
+{% if not is_video_only %}
+## What to explore in the repo
+
+- Program / contract entrypoints and account models
+- API routes and WebSocket event handlers
+- Frontend wallet adapter and game room components
+- Tests, scripts, and deployment configs
+
+## Contributing
+
+Issues and PRs are welcome. If this helped you learn something, a ⭐ on GitHub makes it easier for others to find.
+{% else %}
+## Subscribe
+
+If this helped you, subscribe on {{ youtube.channel_handle or 'YouTube' }} for more tutorials.
+{% endif %}
 
 ## Links
 
-- GitHub: {{ github.repo_url }}
-{% if cross_links.website %}- Website: {{ cross_links.website }}
+{% if primary_video_url %}
+- **Video:** [{{ primary_video_url }}]({{ primary_video_url }})
+{% endif %}
+{% if github.repo_url %}
+- **GitHub:** [{{ github.repo_url }}]({{ github.repo_url }})
+{% endif %}
+{% if cross_links.website %}- **Website:** [{{ cross_links.website }}]({{ cross_links.website }})
 {% endif %}
 
 ---
 
-*Disclaimer: Educational content only. Not financial advice.*
+*Disclaimer: Educational content only. Not financial advice. Gambling and trading involve risk; use responsibly and comply with local laws.*
 
 {% for tag in social.hashtags | default([]) %}#{{ tag | replace('#', '') | replace(' ', '') }} {% endfor %}

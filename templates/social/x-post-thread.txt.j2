@@ -1,32 +1,42 @@
-Thread: Launch / promote {{ project_name }}
+X / Twitter thread — {{ project_name }}
+=========================================
 
+Tweet 1 (hook — post first):
 ---
-Tweet 1 (hook):
-Open-sourced {{ github.primary_keyword }} 🚀
-
-{{ github.short_description | truncate(200, True, '...') }}
-
-⭐ {{ github.repo_url }}
-
----
-Tweet 2 (features):
-What you get:
-{% for feature in github.features[:4] %}
-• {{ feature }}
-{% else %}
-• Full source on GitHub
-• Docs + setup guide
-{% endfor %}
-
----
-Tweet 3 (CTA):
-{% if youtube.videos %}🎥 Tutorial: {{ youtube.videos[0].primary_keyword }}
-{% endif %}🔗 Repo: {{ github.repo_url }}
-{% if cross_links.website %}🌐 {{ cross_links.website }}
+{% if is_video_only %}🎬 New tutorial: {{ github.primary_keyword }}
+{% else %}🚀 Open-sourced: {{ github.primary_keyword }}
 {% endif %}
 
+{{ github.short_description | truncate(220, True, '...') }}
+
+{% if primary_video_url %}▶️ {{ primary_video_url }}
+{% endif %}{% if github.repo_url %}⭐ {{ github.repo_url }}
+{% endif %}{% if cross_links.website %}🌐 {{ cross_links.website }}
+{% endif %}
+
+Tweet 2 (what it does):
+---
+What's inside:
+{% for feature in github.features[:5] %}
+✅ {{ feature }}
+{% endfor %}
+
+Tweet 3 (stack):
+---
+Built with:
+{% for item in github.tech_stack[:5] %}{{ item }}{% if not loop.last %} · {% endif %}{% endfor %}
+
+Tweet 4 (CTA):
+---
+{% if primary_video_url %}Watch: {{ primary_video_url }}
+{% endif %}{% if github.repo_url %}Code: {{ github.repo_url }}
+{% endif %}{% if cross_links.website %}Site: {{ cross_links.website }}
+{% endif %}
+
+Forks, stars, and feedback welcome 🙏
 {% for tag in social.hashtags | default([]) %}#{{ tag | replace('#', '') | replace(' ', '') }} {% endfor %}
 
 ---
-Single-post variant (≤280 chars target):
-New: {{ github.primary_keyword }} — {{ github.short_description | truncate(120, True, '...') }} {{ github.repo_url }}
+Single-post variant (~280 chars — copy/paste):
+---
+Shipped {{ github.primary_keyword }} — {{ github.short_description | truncate(100, True, '...') }} {{ github.repo_url }}{% if cross_links.website %} {{ cross_links.website }}{% endif %}

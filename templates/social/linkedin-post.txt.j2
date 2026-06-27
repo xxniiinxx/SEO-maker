@@ -1,22 +1,31 @@
 LinkedIn post — {{ project_name }}
+===================================
+
+Copy/paste version:
 
 ---
-I just open-sourced {{ github.primary_keyword }}.
+I just open-sourced **{{ github.primary_keyword }}**.
 
 {{ github.short_description }}
 
-What it helps with:
+**Why it matters**
 {% for use_case in github.use_cases %}
-• {{ use_case }}
-{% else %}
-• Practical workflows for {{ niche | lower }}
+→ {{ use_case }}
 {% endfor %}
 
-Tech: {% for item in github.tech_stack %}{{ item }}{% if not loop.last %}, {% endif %}{% else %}{{ github.language | default('open source') }}{% endfor %}
+**Key capabilities**
+{% for feature in github.features[:4] %}
+• {{ feature }}
+{% endfor %}
 
-Explore the repo: {{ github.repo_url }}
-{% if cross_links.website %}
-Project page: {{ cross_links.website }}
+**Tech:** {% for item in github.tech_stack %}{{ item }}{% if not loop.last %} · {% endif %}{% endfor %}
+
+🔗 GitHub: {{ github.repo_url }}
+{% if cross_links.website %}🌐 Live project: {{ cross_links.website }}
 {% endif %}
 
-#OpenSource #Developer #{{ github.primary_keyword | replace(' ', '') | replace('-', '') }}
+If you're building on {{ niche | lower }}, I'd love your feedback — connect or comment below.
+
+#OpenSource #Web3 #Developer #BuildInPublic {% for tag in social.hashtags[:3] %}#{{ tag | replace('#', '') | replace(' ', '') }} {% endfor %}
+
+*Educational content. Not financial advice.*

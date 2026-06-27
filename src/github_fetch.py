@@ -7,6 +7,18 @@ from urllib.parse import urlparse
 
 import requests
 
+from src.content_enrich import (
+    extract_primary_keyword,
+    infer_features,
+    infer_niche,
+    infer_repo_name_suggestions,
+    infer_tech_stack,
+    infer_use_cases,
+    parse_readme_features,
+    pick_hashtags,
+    pick_subreddits,
+)
+
 GITHUB_API = "https://api.github.com/repos/{owner}/{repo}"
 README_API = "https://api.github.com/repos/{owner}/{repo}/readme"
 TOPICS_API = "https://api.github.com/repos/{owner}/{repo}/topics"
@@ -51,7 +63,7 @@ def fetch_repo(url: str, token: str | None = None) -> dict:
         timeout=30,
     )
     if readme_resp.ok:
-        readme_excerpt = readme_resp.text[:2000]
+        readme_excerpt = readme_resp.text[:8000]
 
     return {
         "owner": owner,
@@ -63,7 +75,8 @@ def fetch_repo(url: str, token: str | None = None) -> dict:
         "license": (data.get("license") or {}).get("spdx_id") or "MIT",
         "homepage": data.get("homepage") or "",
         "stars": data.get("stargazers_count", 0),
-        "readme_excerpt": readme_excerpt,
+        "readme_excerpt": readme_excerpt[:800] if readme_excerpt else "",
+        "readme_full": readme_excerpt,
     }
 
 
@@ -71,22 +84,29 @@ def repo_to_config_seed(repo: dict, niche: str = "") -> dict:
     """Build a minimal project config dict from fetched GitHub data."""
     repo_name = repo["repo_name"]
     description = repo["description"] or f"Open-source {repo_name} project"
-    primary = description.split("—")[0].split("-")[0].strip() or repo_name.replace("-", " ")
+    topics = repo["topics"][:10] if repo["topics"] else []
+    readme = repo.get("readme_full") or repo.get("readme_excerpt") or ""
+    primary = extract_primary_keyword(description, repo_name, topics)
+    inferred_niche = infer_niche(description, topics, niche)
 
     return {
         "project_name": repo_name,
-        "niche": niche or "Open-source developer tools",
+        "niche": inferred_niche,
         "github": {
             "repo_url": repo["repo_url"],
             "repo_name": repo_name,
             "primary_keyword": primary,
             "short_description": description[:GITHUB_ABOUT_MAX] if description else primary,
-            "topics": repo["topics"][:10] if repo["topics"] else [],
+            "topics": topics,
             "language": repo["language"],
             "license": repo["license"],
-            "features": [],
-            "tech_stack": [repo["language"]] if repo["language"] else [],
-            "use_cases": [],
+            "readme_excerpt": readme,
+            "features": infer_features(description, topics, parse_readme_features(readme), readme),
+            "tech_stack": infer_tech_stack(
+                description, topics, repo["language"], [], readme
+            ),
+            "use_cases": infer_use_cases(description, topics, repo_name, inferred_niche, []),
+            "repo_name_suggestions": infer_repo_name_suggestions(repo_name, primary, topics),
         },
         "youtube": {
             "channel_handle": "",
@@ -100,8 +120,8 @@ def repo_to_config_seed(repo: dict, niche: str = "") -> dict:
         },
         "social": {
             "enabled": True,
-            "hashtags": [],
-            "subreddits": [],
+            "hashtags": pick_hashtags(topics, primary),
+            "subreddits": pick_subreddits(topics, inferred_niche),
         },
     }
 

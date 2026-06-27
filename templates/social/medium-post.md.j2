@@ -4,45 +4,67 @@
 
 ## Introduction
 
-If you are searching for **{{ github.primary_keyword | lower }}** tooling in the {{ niche }} space, this project is worth a bookmark.
+If you're building in **{{ niche }}**, [**{{ project_name }}**]({{ github.repo_url }}) is an open-source reference you can run, fork, and extend — not just a snippet or slide deck.
 
-## What {{ project_name }} does
+{% if cross_links.website %}
+Try the live project: [{{ cross_links.website }}]({{ cross_links.website }})
+{% endif %}
+
+## The problem
+
+Many repos show one layer in isolation (only the contract, or only the UI). Real users need wallets connected, state synchronized, and outcomes they can trust. This project demonstrates that full path.
+
+## What {{ project_name }} delivers
 
 {% for feature in github.features %}
 - {{ feature }}
-{% else %}
-{{ github.short_description }}
 {% endfor %}
 
-## Who it is for
+## How the system fits together
+
+{% for point in architecture_points %}
+- {{ point }}
+{% endfor %}
+
+## Who should use this
 
 {% for use_case in github.use_cases %}
 - {{ use_case }}
-{% else %}
-Developers exploring {{ github.primary_keyword | lower }} workflows.
 {% endfor %}
 
-## Get started
+## Tech stack
 
-Repository: {{ github.repo_url }}
+{% for item in github.tech_stack %}
+- **{{ item }}**
+{% endfor %}
+
+## Get started in minutes
 
 ```bash
 git clone {{ github.repo_url }}.git
 cd {{ github.repo_name }}
 ```
 
+Follow the README to install dependencies, configure `.env`, and run locally. Typical flow:
+
+{% for step in setup_steps %}
+- {{ step }}
+{% endfor %}
+
+Full documentation: [{{ github.repo_url }}]({{ github.repo_url }})
+
 {% if youtube.videos %}
-## Watch the tutorial
+## Watch it in action
 
 {% for video in youtube.videos %}
-- {{ video.primary_keyword }} — {{ video.video_topic }}
+- **{{ video.primary_keyword }}** — {{ video.video_topic }}
 {% endfor %}
 {% endif %}
 
-## Final thoughts
+## Closing thoughts
 
-Star the repo if it helps your workflow. Issues and PRs welcome.
+If this project saves you time or teaches you something new, star the repo and share feedback. Open source grows when we document the *whole* stack, not just the hype.
 
 **Keywords:** {{ github.primary_keyword }}{% for topic in github.topics %}, {{ topic }}{% endfor %}
 
-*Not financial advice. Use at your own risk.*
+*Not financial advice. Use at your own risk. Educational purposes only.*

@@ -1,10 +1,21 @@
+Discord announcement — {{ project_name }}
+=========================================
+
 📢 **New open-source release: {{ project_name }}**
 
 {{ github.short_description }}
 
-🔗 {{ github.repo_url }}
-{% if youtube.videos %}🎥 {{ youtube.videos[0].primary_keyword }}
-{% endif %}
-⭐ Star / fork welcome — feedback in issues.
+**Highlights**
+{% for feature in github.features[:5] %}
+• {{ feature }}
+{% endfor %}
 
-Not financial advice. Educational use only.
+🔗 **Repo:** {{ github.repo_url }}
+{% if cross_links.website %}🌐 **Site:** {{ cross_links.website }}
+{% endif %}
+{% if youtube.videos %}🎥 **Video:** {{ youtube.videos[0].primary_keyword }}
+{% endif %}
+
+⭐ Stars / forks welcome — drop questions in GitHub Issues.
+
+*Educational use only. Not financial advice.*
